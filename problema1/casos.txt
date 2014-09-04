@@ -1,0 +1,6 @@
+entra c-1 veces por roturas
+10%n
+25%n
+50%n
+75%n
+ubicación de los baches (todos juntos), equiespaciados
