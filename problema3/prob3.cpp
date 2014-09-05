@@ -83,22 +83,22 @@ void resolver(int productoi, int &primerCamionVacio, int &mejorHastaAhora, vecto
 		
     int primerCamionVacioTemp = primerCamionVacio;
     
-          for(int camionj=0; camionj<=primerCamionVacioTemp; camionj++) {
-                
+          for(int camionj=0; camionj<=primerCamionVacioTemp; camionj++) {	// no pruebo poner el producto en dos camiones vacíos distintos (camiones indistinguibles) - PODA 1
+                                                                        
                 pair<bool, int> sePuedeAgregar = nuevoHazard(productoi,camionj,productosEnCamion,M,hazard2);
                 int hazardViejo = hazardCamion[camionj];
                 
-                if(sePuedeAgregar.first) {			// no me pasé del hazard permitido
+                if(sePuedeAgregar.first) {								// no me pasé del hazard permitido
           
-                    resTemp[productoi] = camionj + 1;				// para numerar los camiones como se pide, con índices entre 1 y C
-                    productosEnCamion[camionj] += (1<<productoi);	// agrego el producto i al camion camionj
-                    hazardCamion[camionj] = sePuedeAgregar.second;	// actualizo el hazard total del camion camionj
+                    resTemp[productoi] = camionj + 1;					// para numerar los camiones como se pide, con índices entre 1 y C
+                    productosEnCamion[camionj] += (1<<productoi);		// agrego el producto i al camion camionj
+                    hazardCamion[camionj] = sePuedeAgregar.second;		// actualizo el hazard total del camion camionj
                     
                     if(camionj == primerCamionVacioTemp) {
 							primerCamionVacio++; 
-					}								// para la correcta realización de la poda 1
+					}													// actualizo el último camión que usé para realizar bien la PODA 1	
                     
-                    if(primerCamionVacio <= mejorHastaAhora) {			// no recorro ramas innecesarias del árbol
+                    if(primerCamionVacio <= mejorHastaAhora) {			// no intento poner más productos si se que no va a ser de forma óptima - PODA 2
 						resolver(productoi+1, primerCamionVacio, mejorHastaAhora, resTemp, res, hazardCamion, productosEnCamion, M, n, hazard2);
                     }
                     
@@ -113,7 +113,7 @@ void resolver(int productoi, int &primerCamionVacio, int &mejorHastaAhora, vecto
                     productosEnCamion[camionj] -= (1<<productoi);						// saco el producto i del camion j
                     hazardCamion[camionj] = hazardViejo;
 
-					if(camionj == primerCamionVacioTemp) { primerCamionVacio--; }	// para la correcta realización de la poda 1
+					if(camionj == primerCamionVacioTemp) { primerCamionVacio--; }		// para la correcta realización de la PODA 1
                 } 
 
           }
