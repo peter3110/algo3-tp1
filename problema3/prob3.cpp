@@ -30,7 +30,7 @@ int main(){
 	vector<int> resTemp, res, hazardCamion, productosEnCamion;
 
 	/* De dónde leemos la entrada y adónde ponemos el output */
-	freopen("input.in","r",stdin); 
+	freopen("3.in2","r",stdin); 
 	freopen("output.out","w",stdout); 
     
     /* Para cada entrada que nos pasan, resuelvo el problema */
@@ -98,7 +98,9 @@ void resolver(int productoi, int &primerCamionVacio, int &mejorHastaAhora, vecto
 							primerCamionVacio++; 
 					}								// para la correcta realización de la poda 1
                     
-                    resolver(productoi+1, primerCamionVacio, mejorHastaAhora, resTemp, res, hazardCamion, productosEnCamion, M, n, hazard2);
+                    if(primerCamionVacio <= mejorHastaAhora) {			// no recorro ramas innecesarias del árbol
+						resolver(productoi+1, primerCamionVacio, mejorHastaAhora, resTemp, res, hazardCamion, productosEnCamion, M, n, hazard2);
+                    }
                     
                     if(productoi + 1 == n) {				
 						  if(primerCamionVacio <= mejorHastaAhora) {	// si llegue al último producto y encontré una mejor solución, 
