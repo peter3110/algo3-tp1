@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <cstdio>
 #include <utility>
+#include <sys/time.h>
 using namespace std;
 
 /* Funciones Auxiliares */
@@ -17,21 +18,32 @@ void resolver(int i, int &primerCamionVacio, int &mejorHastaAhora, vector<int> &
 			  vector<int> &productosEnCamion, int &M, int &n, int hazard2[]);
 pair<bool, int> nuevoHazard(int productoi, int camion, vector<int> &productosEnCamion, int &M, int hazard2[]);
 
+/* Para medir tiempos */
+timeval start, end;
+double tiempoTomado;
+void init_time(){
+     gettimeofday(&start,NULL);
+}
+double get_time(){
+    gettimeofday(&end,NULL);
+    return (1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec))/1000000.0;
+}
+
 
 /* El main del programa que resuelve el problema */
 
 int main(){
 	
 	/* Variables locales */
-	const int maxN = 20;			// por la naturaleza del problema, asumimos que el valor máximo de N tiene un límite
+	const int maxN = 20;			  // por la naturaleza del problema, asumimos que el valor máximo de N le ponemos un límite
 	int hazard2[1 << maxN];			// aca guardamos el hazard total que genera cada posible subconjunto de productos
 	vector< vector<int> > hazards;	// aca guardamos el hazard que hay entre cada par de productos
 	int primerCamionVacio, mejorHastaAhora, temp, M, n;
 	vector<int> resTemp, res, hazardCamion, productosEnCamion;
 
 	/* De dónde leemos la entrada y adónde ponemos el output */
-	freopen("3.in2","r",stdin); 
-	freopen("output.out","w",stdout); 
+	freopen("promedio.in","r",stdin); 
+	freopen("tiempos_promedio.out","w",stdout); 
     
     /* Para cada entrada que nos pasan, resuelvo el problema */
 	while(cin >> n >> M) {
@@ -57,11 +69,16 @@ int main(){
 		resTemp.resize(n); fill(resTemp.begin(), resTemp.end(), -1);
 		
 		/* Precalculo el hazard total que genera cada subconjunto de productos */
+    //~ init_time();
 		llenarHazards(hazards, n, hazard2);
-		
+    // tiempoTomado = get_time();
 		/* Resuelvo el problema con backtracking */
+    init_time();
 		resolver(0, primerCamionVacio, mejorHastaAhora, resTemp, res, hazardCamion, productosEnCamion, M, n, hazard2);
+    tiempoTomado = get_time();
 		
+    /* Devuelvo el tiempo tomado */
+    cout << tiempoTomado << endl;
 		/* Devuelvo el resultado */
 		cout << mejorHastaAhora << " ";
 		for(int i=0; i<n; i++) { cout << res[i] << " ";}
