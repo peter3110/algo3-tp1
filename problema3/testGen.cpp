@@ -13,9 +13,9 @@ void genTest(int N, int M){   // hace casos de prueba para n=1...N
     cout << n << " " << M << endl;
     for(int i = 0; i < n - 1; i++) {
       for(int j = i + 1; j < n; j++) {
-        // cout << M+1 << " ";            // mejor caso
-        // cout << 1 << " ";              // peor caso
-        cout << rand() % M + 1 << " ";    // caso promedio
+        cout << M+1 << " ";            // mejor caso
+        // cout << 1 << " ";              // mejor caso
+        // cout << rand() % M + 1 << " ";    // caso promedio
       }
     }
     cout << "0" << endl;
