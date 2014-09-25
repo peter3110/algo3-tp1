@@ -1,0 +1,5 @@
+
+1) en cada ejemplo uso un N que depende de cuánto
+   tiempo tarda. En algunos, como soporto N=100, 
+   uso N=1..100. Pero en los que aguanta hasta N=20
+   uso N=1..20
