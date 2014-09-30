@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <utility>
 #include <sys/time.h>
+#include <iomanip>
 using namespace std;
 
 /* Funciones Auxiliares */
@@ -18,17 +19,6 @@ void resolver(int i, int &primerCamionVacio, int &mejorHastaAhora, vector<int> &
 			  vector<int> &productosEnCamion, int &M, int &n, int hazard2[], vector <vector<int> > &hazards);
 pair<bool, int> nuevoHazard(int productoi, int camion, vector<int> &productosEnCamion, int &M, int hazard2[], vector <vector<int> > &hazards);
 
-/* Para medir tiempos */
-timeval start, end;
-double tiempoTomado1, tiempoTomado2;
-void init_time(){
-     gettimeofday(&start,NULL);
-}
-double get_time(){
-    gettimeofday(&end,NULL);
-    return (1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec))/1000000.0;
-}
-
 
 /* El main del programa que resuelve el problema */
 
@@ -36,17 +26,10 @@ int main(){
 	
 	/* Variables locales */
 	const int maxN = 20;			  // por la naturaleza del problema, asumimos que el valor máximo de N le ponemos un límite
-	int hazard2[1 << maxN];			// aca guardamos el hazard total que genera cada posible subconjunto de productos
-	vector< vector<int> > hazards;	// aca guardamos el hazard que hay entre cada par de productos
+	int hazard2[1 << maxN];			  // aca guardamos el hazard total que genera cada posible subconjunto de productos
+	vector< vector<int> > hazards;	  // aca guardamos el hazard que hay entre cada par de productos
 	int primerCamionVacio, mejorHastaAhora, temp, M, n;
 	vector<int> resTemp, res, hazardCamion, productosEnCamion;
-
-	/* De dónde leemos la entrada y adónde ponemos el output */
-	freopen("promedio.in","r",stdin); 
-	freopen("tiempo_prom.out","w",stdout); 
-	//freopen("tiempo_peor.out","w",stdout); 
-	//freopen("tiempo_mejor.out","w",stdout); 
-	vector<double> precalculos, backtracking;
     
     /* Para cada entrada que nos pasan, resuelvo el problema */
 	while(cin >> n >> M) {
@@ -72,16 +55,11 @@ int main(){
 		resTemp.resize(n); fill(resTemp.begin(), resTemp.end(), -1);
 		
 		/* Precalculo el hazard total que genera cada subconjunto de productos */
-		init_time();
-		//llenarHazards(hazards, n, hazard2);
-		tiempoTomado1 = get_time();
+		llenarHazards(hazards, n, hazard2);
+		
 		/* Resuelvo el problema con backtracking */
 		resolver(0, primerCamionVacio, mejorHastaAhora, resTemp, res, hazardCamion, productosEnCamion, M, n, hazard2, hazards);
-		tiempoTomado2 = get_time();
-			
-		/* Devuelvo el tiempo tomado */
-		precalculos.push_back(tiempoTomado1);
-		backtracking.push_back(tiempoTomado2-tiempoTomado1);
+
 		/* Devuelvo el resultado */
 		cout << mejorHastaAhora << " ";
 		for(int i=0; i<n; i++) { cout << res[i] << " ";}
@@ -90,9 +68,6 @@ int main(){
 		/* Leo el 0 que marca la finalización de esta instancia */
 		cin >> temp;
 	}
-	for(unsigned int i=0; i<precalculos.size(); i++) {cout << precalculos[i] << endl;}
-	cout << endl;
-	for(unsigned int i=0; i<precalculos.size(); i++) {cout << backtracking[i] << endl;}
 	
     return 0;
 }
@@ -107,12 +82,11 @@ void resolver(int productoi, int &primerCamionVacio, int &mejorHastaAhora, vecto
     int primerCamionVacioTemp = primerCamionVacio;
     
           for(int camionj=0; camionj<=primerCamionVacioTemp; camionj++) {	// no pruebo poner el producto en dos camiones vacíos distintos (camiones indistinguibles) - PODA 1
-                                                                        
-                //pair<bool, int> sePuedeAgregar = nuevoHazard(productoi,camionj,productosEnCamion,M,hazard2, hazards);
-                pair<bool, int> sePuedeAgregar = nuevoHazard2(productoi, camionj, productosEnCamion, hazardCamion, hazards, M);
+			                                                            
+                pair<bool, int> sePuedeAgregar = nuevoHazard(productoi,camionj,productosEnCamion,M,hazard2, hazards);
                 int hazardViejo = hazardCamion[camionj];
                 
-                if(sePuedeAgregar.first) {								// no me pasé del hazard permitido
+                if(sePuedeAgregar.first) {								// no me pasé del hazard permitido para el camion
           
                     resTemp[productoi] = camionj + 1;					// para numerar los camiones como se pide, con índices entre 1 y C
                     productosEnCamion[camionj] += (1<<productoi);		// agrego el producto i al camion camionj
@@ -168,16 +142,4 @@ pair<bool, int> nuevoHazard(int productoi, int camionj, vector<int> &productosEn
 	int nuevoHz = hazard2[productosEnCamion[camionj] | (1 << productoi)];
 	pair<bool, int> res = make_pair((nuevoHz<=M), nuevoHz);				// menor o igual, porque cada camion soporta hasta M de hazard total
     return res;
-}
-
-/* Igual que nuevoHazard, pero sin usar el arreglo hazard2 */
-pair<bool, int> nuevoHazard2(int productoi, int camionj, vector<int> &productosEnCamion, vector<int> &hazardCamion, vector <vector<int> > &hazards, int &M){
-	int nuevoHz = hazardCamion[camionj];
-    for(unsigned int productok=0; productok<productosEnCamion.size(); productok++) {	// para todos los productos...
-        if((productosEnCamion[camionj]&(1<<productok)) != 0) {			// si el producto productok esta en el camion camionj..
-			nuevoHz += hazards[productoi][productok];
-		}	
-	}
-	pair<bool, int> res = make_pair((nuevoHz <= M), nuevoHz);	
-	return res;
 }
